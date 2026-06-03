@@ -1,24 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-            
-    // ----------------------------------------------------
-    // State Manajemen Aplikasi
-    // ----------------------------------------------------
-    const state = {
-        todos: [],
-        links: [],
-        editingTodoId: null,
-        theme: 'dark',
-        timer: {
-            timeLeft: 1500,     // Sisa waktu default (detik)
-            duration: 1500,     // Durasi awal preset (detik)
-            intervalId: null,
-            isRunning: false
-        }
-    };
+// State Manajemen Aplikasi
+const state = {
+    todos: [],
+    links: [],
+    editingTodoId: null,
+    theme: 'dark',
+    timer: {
+        timeLeft: 1500,     // Sisa waktu default (detik)
+        duration: 1500,     // Durasi awal preset (detik)
+        intervalId: null,
+        isRunning: false
+    }
+};
 
-    // ----------------------------------------------------
+// Fungsi Utama Inisialisasi Aplikasi (Memastikan seluruh DOM selesai dibuat)
+function initApp() {
     // Selektor Elemen DOM
-    // ----------------------------------------------------
     const greetingEl = document.getElementById('greeting');
     const dateDisplayEl = document.getElementById('date-display');
     const clockEl = document.getElementById('clock');
@@ -73,14 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     function updateTime() {
         const now = new Date();
-        
-        // Format jam 24 jam dengan penambahan nol di depan
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         clockEl.textContent = `${hours}:${minutes}:${seconds}`;
 
-        // Ucapan dinamis berdasarkan jam
         const hourNum = now.getHours();
         let greetText = "Welcome";
         if (hourNum >= 5 && hourNum < 12) {
@@ -94,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         greetingEl.textContent = greetText;
 
-        // Tampilan kalender ramah pengguna
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         dateDisplayEl.textContent = now.toLocaleDateString(undefined, options);
     }
@@ -121,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start();
             osc.stop(ctx.currentTime + 0.6);
         } catch (e) {
-            // Mengatasi pembatasan autoplay browser dengan aman
+            // Autoplay block handler
         }
     }
 
@@ -133,11 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const secs = String(state.timer.timeLeft % 60).padStart(2, '0');
         timerDisplay.textContent = `${mins}:${secs}`;
 
-        // Hitung progres bar visual
         const percentage = (state.timer.timeLeft / state.timer.duration) * 100;
         timerProgress.style.width = `${percentage}%`;
 
-        // Ubah keadaan tombol play/pause
         if (state.timer.isRunning) {
             timerStartPauseBtn.innerHTML = `
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
@@ -158,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.timer.timeLeft--;
             renderTimer();
         } else {
-            // Menghentikan timer ketika selesai
             clearInterval(state.timer.intervalId);
             state.timer.intervalId = null;
             state.timer.isRunning = false;
@@ -170,12 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startPauseTimer() {
         if (state.timer.isRunning) {
-            // Aksi Jeda
             clearInterval(state.timer.intervalId);
             state.timer.intervalId = null;
             state.timer.isRunning = false;
         } else {
-            // Aksi Mulai
             state.timer.isRunning = true;
             state.timer.intervalId = setInterval(stepTimer, 1000);
         }
@@ -194,12 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
         state.timer.duration = seconds;
         state.timer.timeLeft = seconds;
         
-        // Ubah gaya aktif tombol preset secara dinamis
         if (isBreak) {
             presetBreakBtn.className = "px-2.5 py-1 text-xs rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors";
             presetWorkBtn.className = "px-2.5 py-1 text-xs rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
         } else {
-            presetWorkBtn.className = "px-2.5 py-1 text-xs rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:indigo-900/30 font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors";
+            presetWorkBtn.className = "px-2.5 py-1 text-xs rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors";
             presetBreakBtn.className = "px-2.5 py-1 text-xs rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
         }
         resetTimer();
@@ -210,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     presetWorkBtn.addEventListener('click', () => changePreset(1500, false));
     presetBreakBtn.addEventListener('click', () => changePreset(300, true));
 
-    // Render awal keadaan timer
     renderTimer();
 
     // ----------------------------------------------------
@@ -239,12 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.className = "fade-in flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all gap-3";
 
                 const isEditing = state.editingTodoId === todo.id;
-
                 const checkContainer = document.createElement('div');
                 checkContainer.className = "flex items-center gap-3 flex-1 min-w-0";
 
                 if (!isEditing) {
-                    // Mode Tampilan Normal
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.checked = todo.completed;
@@ -265,8 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const actionContainer = document.createElement('div');
                     actionContainer.className = "flex items-center gap-1 shrink-0";
 
-                    // Tombol Edit
                     const editBtn = document.createElement('button');
+                    editBtn.type = "button";
                     editBtn.className = "p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
                     editBtn.innerHTML = `
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -278,8 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderTodos();
                     });
 
-                    // Tombol Hapus
                     const deleteBtn = document.createElement('button');
+                    deleteBtn.type = "button";
                     deleteBtn.className = "p-1.5 text-slate-400 hover:text-red-500 dark:hover:text-red-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
                     deleteBtn.innerHTML = `
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -294,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     li.appendChild(checkContainer);
                     li.appendChild(actionContainer);
                 } else {
-                    // Mode Edit Form Inline
                     const editInput = document.createElement('input');
                     editInput.type = 'text';
                     editInput.value = todo.text;
@@ -302,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     editInput.autofocus = true;
 
                     const saveBtn = document.createElement('button');
+                    saveBtn.type = "button";
                     saveBtn.className = "p-1.5 text-green-600 dark:text-green-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
                     saveBtn.innerHTML = `
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -310,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     
                     const cancelBtn = document.createElement('button');
+                    cancelBtn.type = "button";
                     cancelBtn.className = "p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
                     cancelBtn.innerHTML = `
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -456,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
             anchor.appendChild(textWrap);
 
             const deleteBtn = document.createElement('button');
+            deleteBtn.type = "button";
             deleteBtn.className = "absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 dark:hover:text-red-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-all opacity-100 md:opacity-0 group-hover:opacity-100";
             deleteBtn.innerHTML = `
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -478,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (raw) {
             state.links = JSON.parse(raw);
         } else {
-            // Data default jika penyimpanan lokal kosong
             state.links = [
                 { id: 'g1', name: 'Google', url: 'https://google.com' },
                 { id: 'g2', name: 'GitHub', url: 'https://github.com' },
@@ -543,7 +527,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadLinks();
-
-    // Inisialisasi tema
     initTheme();
-});
+}
+
+// Handler Pencegah Kegagalan Pemuatan DOM (Race-Condition Protection)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
