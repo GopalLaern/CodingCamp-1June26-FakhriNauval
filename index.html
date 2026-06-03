@@ -3,68 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Focus Dashboard</title>
-    <!-- Pemanggilan CSS dari dalam folder css -->
+    <title>Dashboard Focus</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    </script>
 </head>
 <body>
-
     <div class="container">
-        <!-- Dashboard Header -->
-        <header>
-            <div class="greeting-container">
-                <h1 id="greeting-text">Hello</h1>
-                <p id="date-text">Loading date...</p>
-            </div>
-            <!-- Perbaikan spasi pada tag button di bawah ini -->
-            <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
-                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
-            </button>
+        
+        <header class="card header-card">
+            <button id="theme-toggle" class="theme-toggle-top">🌙</button>
+            <div id="clock">00:00:00</div>
+            <div id="datetime">Loading...</div>
+            <div id="greeting">Good Morning</div>
         </header>
 
-        <!-- Main Workspace Grid -->
-        <main class="dashboard-grid">
-            
-            <!-- Focus Timer Card -->
-            <section class="card focus-timer">
-                <h2 class="card-title">⏱️ Focus Timer</h2>
-                <div class="timer-display" id="timer-display">25:00</div>
-                <div class="timer-controls">
-                    <button class="btn btn-primary" id="timer-start">Start</button>
-                    <button class="btn btn-secondary" id="timer-stop">Pause</button>
-                    <button class="btn btn-danger" id="timer-reset">Reset</button>
-                </div>
-            </section>
+        <main class="grid">
+            <div class="col-left">
+                <section class="card text-center">
+                    <h2 class="card-title">Focus Timer</h2>
+                    <div id="timer">25:00</div>
+                    <div class="timer-setup">
+                        <label>Minutes:</label>
+                        <input type="number" id="timer-min" value="25" min="1" max="180">
+                    </div>
+                    <div class="flex-row">
+                        <button id="start" class="btn btn-primary">Start</button>
+                        <button id="pause" class="btn btn-secondary">Stop</button>
+                        <button id="reset" class="btn btn-light">Reset</button>
+                    </div>
+                </section>
 
-            <!-- Quick Links Card -->
-            <section class="card quick-links">
-                <h2 class="card-title">🔗 Quick Links</h2>
-                <form id="link-form" class="link-input-group">
-                    <input type="text" id="link-name-input" placeholder="Name (e.g. GitHub)" required>
-                    <input type="text" id="link-url-input" placeholder="URL (e.g. github.com)" required>
-                    <button type="submit" class="btn btn-primary">Add</button>
-                </form>
-                <div class="links-grid" id="links-grid">
-                    <!-- Quick links akan diisi otomatis lewat JS -->
-                </div>
-            </section>
+                <section class="card">
+                    <h2 class="card-title">Quick Links</h2>
+                    <form id="link-form" class="form-row">
+                        <input id="link-name" placeholder="Link name" required autocomplete="off">
+                        <input id="link-url" placeholder="URL" required autocomplete="off">
+                        <button type="submit" class="btn btn-primary">Add Link</button>
+                    </form>
+                    <div id="links" class="links-list"></div>
+                </section>
+            </div>
 
-            <!-- To-Do List Card -->
-            <section class="card todo-list full-width">
-                <h2 class="card-title">📝 To-Do List</h2>
-                <form id="todo-form" class="todo-input-group">
-                    <input type="text" id="todo-input" placeholder="Add a new task..." required>
-                    <button type="submit" class="btn btn-primary">Add Task</button>
-                </form>
-                <ul class="todo-list-items" id="todo-list-items">
-                    <!-- Tugas akan diisi otomatis lewat JS -->
-                </ul>
-            </section>
-
+            <div class="col-right">
+                <section class="card tasks-card">
+                    <h2 class="card-title">Tasks</h2>
+                    <form id="todo-form" class="form-row">
+                        <input id="todo-input" placeholder="Add a new task..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
+                    <ul id="todos"></ul>
+                </section>
+            </div>
         </main>
+
     </div>
 
-    <!-- Pemanggilan JavaScript dari dalam folder js -->
     <script src="js/app.js"></script>
 </body>
 </html>
