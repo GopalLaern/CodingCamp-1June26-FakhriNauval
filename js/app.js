@@ -1,4 +1,20 @@
-// --- State Management & Local Storage Keys ---
+// --- Pengaman Local Storage (Mencegah Error di Browser Tertentu) ---
+let safeLocalStorage;
+try {
+    const testKey = '__test_storage__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    safeLocalStorage = localStorage;
+} catch (e) {
+    console.warn("Local storage tidak diizinkan oleh browser Anda. Menggunakan penyimpanan sementara di memori.");
+    safeLocalStorage = {
+        store: {},
+        getItem(key) { return this.store[key] || null; },
+        setItem(key, value) { this.store[key] = String(value); }
+    };
+}
+
+// --- State Management ---
 const STORAGE_KEYS = {
     TODOS: 'focus_dashboard_todos',
     LINKS: 'focus_dashboard_links',
@@ -6,16 +22,16 @@ const STORAGE_KEYS = {
 };
 
 let state = {
-    todos: JSON.parse(localStorage.getItem(STORAGE_KEYS.TODOS)) || [
+    todos: JSON.parse(safeLocalStorage.getItem(STORAGE_KEYS.TODOS)) || [
         { id: 1, text: "Explore the Focus Dashboard layout", completed: false },
         { id: 2, text: "Try setting a 25-minute Pomodoro session", completed: false }
     ],
-    links: JSON.parse(localStorage.getItem(STORAGE_KEYS.LINKS)) || [
+    links: JSON.parse(safeLocalStorage.getItem(STORAGE_KEYS.LINKS)) || [
         { id: 1, name: "Google", url: "https://google.com" },
         { id: 2, name: "GitHub", url: "https://github.com" },
         { id: 3, name: "Wikipedia", url: "https://wikipedia.org" }
     ],
-    theme: localStorage.getItem(STORAGE_KEYS.THEME) || 'light'
+    theme: safeLocalStorage.getItem(STORAGE_KEYS.THEME) || 'light'
 };
 
 // --- DOM Elements Cache ---
@@ -41,10 +57,11 @@ const linksGrid = document.getElementById('links-grid');
 
 // --- Greeting, Date, & Time Logic ---
 function updateDateTime() {
+    if (!greetingText || !dateText) return;
+    
     const now = new Date();
     const hours = now.getHours();
     
-    // Format Date & Time
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const timeOptions = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
     const formattedDate = now.toLocaleDateString(undefined, dateOptions);
@@ -52,7 +69,6 @@ function updateDateTime() {
     
     dateText.textContent = `${formattedDate} • ${formattedTime}`;
 
-    // Determine Greeting
     let greeting = "Good evening";
     if (hours >= 5 && hours < 12) {
         greeting = "Good morning";
@@ -62,7 +78,6 @@ function updateDateTime() {
     greetingText.textContent = `${greeting}, welcome to your space`;
 }
 
-// Run clock update
 setInterval(updateDateTime, 1000);
 updateDateTime();
 
@@ -70,35 +85,37 @@ updateDateTime();
 // --- Theme Toggle Logic ---
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
-        themeIcon.textContent = '☀️';
-        themeLabel.textContent = 'Light Mode';
-    } else {
-        themeIcon.textContent = '🌙';
-        themeLabel.textContent = 'Dark Mode';
+    if (themeIcon && themeLabel) {
+        if (theme === 'dark') {
+            themeIcon.textContent = '☀️';
+            themeLabel.textContent = 'Light Mode';
+        } else {
+            themeIcon.textContent = '🌙';
+            themeLabel.textContent = 'Dark Mode';
+        }
     }
-    localStorage.setItem(STORAGE_KEYS.THEME, theme);
+    safeLocalStorage.setItem(STORAGE_KEYS.THEME, theme);
 }
 
-themeToggleBtn.addEventListener('click', () => {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    applyTheme(state.theme);
-});
-
-// Initialize theme
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(state.theme);
+    });
+}
 applyTheme(state.theme);
 
 
 // --- Focus Timer Logic ---
 let timerInterval = null;
-const DEFAULT_SECONDS = 25 * 60; // 25 Minutes
+const DEFAULT_SECONDS = 25 * 60;
 let timerSecondsRemaining = DEFAULT_SECONDS;
 
 function updateTimerUI() {
+    if (!timerDisplay) return;
     const minutes = Math.floor(timerSecondsRemaining / 60);
     const seconds = timerSecondsRemaining % 60;
-    const displayString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    timerDisplay.textContent = displayString;
+    timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function playTone() {
@@ -116,7 +133,7 @@ function playTone() {
             osc.stop(ctx.currentTime + 0.5);
         }
     } catch (error) {
-        // Handle auto-play block browser policy gracefully
+        console.log("Audio feedback blocked or unsupported by browser settings.");
     }
 }
 
@@ -149,18 +166,19 @@ function resetTimer() {
     updateTimerUI();
 }
 
-timerStartBtn.addEventListener('click', startTimer);
-timerStopBtn.addEventListener('click', stopTimer);
-timerResetBtn.addEventListener('click', resetTimer);
+if (timerStartBtn) timerStartBtn.addEventListener('click', startTimer);
+if (timerStopBtn) timerStopBtn.addEventListener('click', stopTimer);
+if (timerResetBtn) timerResetBtn.addEventListener('click', resetTimer);
 updateTimerUI();
 
 
 // --- To-Do List CRUD ---
 function saveTodos() {
-    localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(state.todos));
+    safeLocalStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(state.todos));
 }
 
 function renderTodos() {
+    if (!todoListItems) return;
     todoListItems.innerHTML = '';
     state.todos.forEach(todo => {
         const li = document.createElement('li');
@@ -209,6 +227,7 @@ function renderTodos() {
 
 function addTodo(e) {
     e.preventDefault();
+    if (!todoInput) return;
     const text = todoInput.value.trim();
     if (!text) return;
 
@@ -267,16 +286,17 @@ function deleteTodo(id) {
     renderTodos();
 }
 
-todoForm.addEventListener('submit', addTodo);
+if (todoForm) todoForm.addEventListener('submit', addTodo);
 renderTodos();
 
 
 // --- Quick Links CRUD ---
 function saveLinks() {
-    localStorage.setItem(STORAGE_KEYS.LINKS, JSON.stringify(state.links));
+    safeLocalStorage.setItem(STORAGE_KEYS.LINKS, JSON.stringify(state.links));
 }
 
 function renderLinks() {
+    if (!linksGrid) return;
     linksGrid.innerHTML = '';
     state.links.forEach(link => {
         const linkCard = document.createElement('div');
@@ -304,12 +324,13 @@ function renderLinks() {
 
 function addLink(e) {
     e.preventDefault();
+    if (!linkNameInput || !linkUrlInput) return;
+    
     const name = linkNameInput.value.trim();
     let url = linkUrlInput.value.trim();
 
     if (!name || !url) return;
 
-    // Tambahkan protokol jika tidak ada
     if (!/^https?:\/\//i.test(url)) {
         url = 'https://' + url;
     }
@@ -334,5 +355,5 @@ function deleteLink(id) {
     renderLinks();
 }
 
-linkForm.addEventListener('submit', addLink);
+if (linkForm) linkForm.addEventListener('submit', addLink);
 renderLinks();

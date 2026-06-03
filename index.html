@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Focus Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
+    <!-- Pemanggilan CSS dari dalam folder css -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -44,7 +44,7 @@
                     <button type="submit" class="btn btn-primary">Add</button>
                 </form>
                 <div class="links-grid" id="links-grid">
-                    <!-- Quick links akan muncul di sini -->
+                    <!-- Quick links akan diisi otomatis lewat JS -->
                 </div>
             </section>
 
@@ -56,12 +56,14 @@
                     <button type="submit" class="btn btn-primary">Add Task</button>
                 </form>
                 <ul class="todo-list-items" id="todo-list-items">
-                    <!-- Tugas akan muncul di sini -->
+                    <!-- Tugas akan diisi otomatis lewat JS -->
                 </ul>
             </section>
 
         </main>
     </div>
 
+    <!-- Pemanggilan JavaScript dari dalam folder js -->
+    <script src="js/app.js"></script>
 </body>
 </html>
