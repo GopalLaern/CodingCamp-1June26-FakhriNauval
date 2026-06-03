@@ -4,11 +4,12 @@ A minimal, client-side productivity app built with vanilla HTML, CSS, and JavaSc
 
 ## Features
 
-- **Time-based greeting** — Good Morning / Afternoon / Evening based on your local time
-- **Live clock** — updates every minute
-- **25-minute focus timer** — start, stop, and reset with a clean countdown display
-- **Task list** — add, edit, complete, and delete tasks; persisted in Local Storage
-- **Quick links** — save favorite URLs as one-click pill buttons; persisted in Local Storage
+Time-based greeting — Good Morning / Afternoon / Evening based on your local time
+Live clock — digital clock that updates every second with the current date
+Focus timer — start, stop, reset, and customize countdown duration with a clean display
+Task list — add, edit, complete, and delete tasks; persisted in Local Storage
+Quick links — save favorite URLs as one-click pill buttons; persisted in Local Storage
+Light / Dark mode — toggle between minimal light and dark themes; choice saved in Local Storage
 
 ## Usage
 
