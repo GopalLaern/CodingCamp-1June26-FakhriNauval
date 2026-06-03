@@ -1,7 +1,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-    --bg-gradient: linear-gradient(135deg, #d8dadc, #e2e8f0);
-    --card: #f2f0f0;
+    --bg-gradient: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    --card: #ffffff;
     --text: #0f172a;
     --text-sub: #64748b;
     --border: #e2e8f0;
@@ -24,7 +24,7 @@
     --btn-stop-text: #f8fafc;
     --btn-reset: #1e293b;
     --btn-reset-text: #94a3b8;
-    --delete: #fb7171;
+    --delete: #f87171;
 }
 body {
     font-family: system-ui, -apple-system, sans-serif;
@@ -33,9 +33,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 30px 15px;
+    padding: 30px 16px;
     color: var(--text);
     transition: background 0.3s;
+}
+@media (max-width: 600px) {
+    body { padding: 16px 12px; }
 }
 .container { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 20px; }
 .card {
@@ -47,15 +50,18 @@ body {
     transition: background 0.2s, border-color 0.2s;
     position: relative;
 }
+@media (max-width: 480px) {
+    .card { padding: 18px; }
+}
 .header-card {
     text-align: center;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 30px;
+    padding: 30px 20px;
 }
 #clock {
-    font-size: 3.5rem;
+    font-size: clamp(2.2rem, 8vw, 3.5rem);
     font-weight: 700;
     color: var(--accent);
     letter-spacing: -1px;
@@ -66,18 +72,19 @@ body {
     color: var(--text-sub);
 }
 #greeting {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
     font-weight: 700;
     margin-top: 4px;
 }
 .theme-toggle-top {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 16px;
+    right: 16px;
     background: none;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     cursor: pointer;
+    z-index: 10;
 }
 .grid {
     display: grid;
@@ -90,22 +97,25 @@ body {
 }
 .col-left { display: flex; flex-direction: column; gap: 20px; }
 .col-right { height: 100%; }
-.tasks-card { display: flex; flex-direction: column; min-height: 480px; }
+.tasks-card { display: flex; flex-direction: column; min-height: auto; }
+@media (min-width: 769px) {
+    .tasks-card { min-height: 480px; }
+}
 .text-center { text-align: center; }
 .card-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 16px;
     text-align: center;
     color: var(--text);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }
 #timer {
-    font-size: 4rem;
+    font-size: clamp(2.8rem, 10vw, 4rem);
     font-weight: 700;
     color: var(--accent);
-    margin: 10px 0;
+    margin: 8px 0;
 }
 .timer-setup {
     display: flex;
@@ -118,7 +128,7 @@ body {
 }
 .timer-setup input {
     width: 60px;
-    padding: 4px;
+    padding: 6px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: var(--card);
@@ -126,9 +136,9 @@ body {
     text-align: center;
     outline: none;
 }
-.flex-row { display: flex; gap: 10px; justify-content: center; }
+.flex-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .btn {
-    padding: 10px 20px;
+    padding: 10px 18px;
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 0.85rem;
@@ -136,11 +146,18 @@ body {
     cursor: pointer;
     transition: background 0.15s, opacity 0.15s;
 }
+@media (max-width: 400px) {
+    .btn { padding: 8px 12px; font-size: 0.8rem; }
+}
 .btn:hover { opacity: 0.9; }
 .btn-primary { background: var(--accent); color: var(--card); border: none; }
 .btn-secondary { background: var(--btn-stop); color: var(--btn-stop-text); }
 .btn-light { background: var(--btn-reset); color: var(--btn-reset-text); }
 .form-row { display: flex; gap: 8px; margin-bottom: 20px; }
+@media (max-width: 480px) {
+    .form-row { flex-direction: column; gap: 8px; }
+    .form-row button { width: 100%; }
+}
 .form-row input {
     flex: 1;
     padding: 10px 14px;
@@ -150,23 +167,34 @@ body {
     color: var(--text);
     outline: none;
     font-size: 0.9rem;
+    width: 100%;
 }
 .form-row input:focus { border-color: var(--accent); }
-.links-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.links-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .link-item {
     display: flex;
     align-items: center;
     background: var(--card);
     border: 1px solid var(--border);
-    padding: 8px 16px;
+    padding: 8px 14px;
     border-radius: 6px;
+    max-width: 100%;
 }
-.link-item a { text-decoration: none; color: var(--text); font-size: 0.85rem; font-weight: 600; }
+.link-item a {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
 .link-item button {
     background: none;
     border: none;
     color: var(--text-sub);
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
     font-size: 0.9rem;
     display: flex;
@@ -174,30 +202,43 @@ body {
     justify-content: center;
 }
 .link-item button:hover { color: var(--delete); }
-#todos { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+#todos { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .todo-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 14px;
+    padding: 10px 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--card);
+    gap: 12px;
 }
-.todo-left { display: flex; align-items: center; gap: 10px; }
+.todo-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
 .todo-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
     accent-color: var(--accent);
+    flex-shrink: 0;
 }
 .todo-item.done span { text-decoration: line-through; opacity: 0.4; }
-.todo-item span { font-size: 0.9rem; }
+.todo-left span {
+    font-size: 0.9rem;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+.todo-right { display: flex; flex-shrink: 0; }
 .todo-item button {
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
 }
