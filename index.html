@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Storage error banner -->
   <div id="storage-error-banner" class="error-banner hidden">
     ⚠️ Could not access Local Storage. Data may not be saved.
-    <button class="btn-dismiss" onclick="this.parentElement.classList.add('hidden')">✕</button>
+    <button type="button" class="btn-dismiss" onclick="this.parentElement.classList.add('hidden')">✕</button>
   </div>
 
   <div class="container">
@@ -28,9 +28,9 @@
       <h2>Focus Timer</h2>
       <div id="timer-display">25:00</div>
       <div class="timer-controls">
-        <button id="btn-start" class="btn btn-primary">Start</button>
-        <button id="btn-stop" class="btn btn-secondary" style="display:none;">Stop</button>
-        <button id="btn-reset" class="btn btn-outline">Reset</button>
+        <button type="button" id="btn-start" class="btn btn-primary">Start</button>
+        <button type="button" id="btn-stop" class="btn btn-secondary" style="display:none;">Stop</button>
+        <button type="button" id="btn-reset" class="btn btn-outline">Reset</button>
       </div>
     </section>
 
@@ -38,8 +38,8 @@
     <section id="todo-section">
       <h2>To-Do List</h2>
       <div class="input-row">
-        <input type="text" id="task-input" placeholder="Add a new task..." autocomplete="off" />
-        <button id="btn-add-task" class="btn btn-primary">Add</button>
+        <input type="text" id="task-input" placeholder="Add a new task..." autocomplete="off">
+        <button type="button" id="btn-add-task" class="btn btn-primary">Add</button>
       </div>
       <p class="validation-msg" id="task-validation" hidden></p>
       <ul id="task-list"></ul>
@@ -50,9 +50,9 @@
     <section id="links-section">
       <h2>Quick Links</h2>
       <div class="input-row input-row--multi">
-        <input type="text" id="link-name-input" placeholder="Label (e.g. GitHub)" autocomplete="off" />
-        <input type="url"  id="link-url-input"  placeholder="URL (e.g. https://github.com)" autocomplete="off" />
-        <button id="btn-add-link" class="btn btn-primary">Add</button>
+        <input type="text" id="link-name-input" placeholder="Label (e.g. GitHub)" autocomplete="off">
+        <input type="url"  id="link-url-input"  placeholder="URL (e.g. https://github.com)" autocomplete="off">
+        <button type="button" id="btn-add-link" class="btn btn-primary">Add</button>
       </div>
       <p class="validation-msg" id="link-validation" hidden></p>
       <div id="links-list"></div>
