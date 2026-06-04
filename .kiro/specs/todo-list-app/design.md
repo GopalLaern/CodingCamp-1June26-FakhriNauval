@@ -1,7 +1,8 @@
-# To-Do List Web Application — Technical Design
+# Dashboard Focus — Technical Design
+
 ## Overview
 
-A single-page, client-side web application built with vanilla HTML, CSS, and JavaScript. All data is persisted in the browser's Local Storage. There is no build step, no framework, and no backend. The app is opened directly as an HTML file or served from a static host.
+A single-page productivity dashboard built with vanilla HTML, CSS, and JavaScript. Features include a real-time clock with greeting, Pomodoro-style focus timer, task management, and quick links for fast website access. All data is persisted in the browser's Local Storage. The app runs directly as an HTML file or from a static host with no backend required.
 
 ---
 
@@ -19,346 +20,295 @@ MiniProjectToDoList/
 
 ---
 
-## HTML Structure (`index.html`)
+## Page Layout
 
-The page is divided into four main sections laid out vertically inside a centered container:
+### Header Section
+- Centered card containing:
+  - Theme toggle button (top-right, absolute position)
+  - Large clock display (HH:MM:SS, responsive sizing)
+  - Full date display (e.g., "Monday, January 15, 2024")
+  - Time-based greeting (Good Morning/Afternoon/Evening)
 
-```
-<body>
-  <div class="container">
-    <!-- Section 1: Greeting & Clock -->
-    <section id="greeting-section">
-      <p id="greeting-text">Good Morning</p>
-      <p id="current-time">9:30 AM</p>
-      <p id="current-date">Monday, January 15, 2024</p>
-    </section>
+### Two-Column Grid (Desktop: 1.1fr + 1fr, Mobile: 1fr)
 
-    <!-- Section 2: Focus Timer -->
-    <section id="timer-section">
-      <div id="timer-display">25:00</div>
-      <div class="timer-controls">
-        <button id="btn-start">Start</button>
-        <button id="btn-stop">Stop</button>
-        <button id="btn-reset">Reset</button>
-      </div>
-    </section>
+**Left Column**
+- Focus Timer card (centered, with input + 3 buttons)
+- Quick Links card (with form inputs + link list)
 
-    <!-- Section 3: To-Do List -->
-    <section id="todo-section">
-      <h2>To-Do List</h2>
-      <div class="task-input-row">
-        <input type="text" id="task-input" placeholder="Add a new task..." />
-        <button id="btn-add-task">Add</button>
-      </div>
-      <ul id="task-list">
-        <!-- Task items injected here by JS -->
-      </ul>
-      <p id="task-empty-state" class="empty-state">No tasks yet. Add one to get started!</p>
-    </section>
-
-    <!-- Section 4: Quick Links -->
-    <section id="links-section">
-      <h2>Quick Links</h2>
-      <div class="link-input-row">
-        <input type="text" id="link-name-input" placeholder="Label (e.g. GitHub)" />
-        <input type="url"  id="link-url-input"  placeholder="URL (e.g. https://github.com)" />
-        <button id="btn-add-link">Add</button>
-      </div>
-      <div id="links-list">
-        <!-- Link buttons injected here by JS -->
-      </div>
-      <p id="links-empty-state" class="empty-state">No quick links yet. Add your favorites!</p>
-    </section>
-  </div>
-</body>
-```
+**Right Column**
+- Tasks card (with form input + task list)
 
 ---
 
 ## CSS Design (`css/style.css`)
 
-### Layout & Theme
+### Layout System
 
-- CSS custom properties (variables) for the color palette, spacing, and typography.
-- Single-column centered layout using `max-width: 680px; margin: 0 auto;`.
-- Sections separated by visible card containers (`background`, `border-radius`, `box-shadow`).
+- **Container**: max-width 960px, centered, vertical flex layout
+- **Responsive Grid**: `grid-template-columns: 1.1fr 1fr` (desktop), `1fr` (mobile @ 768px)
+- **Card Component**: Consistent styling with background, border, 12px border-radius, subtle shadow
+- **Gap/Spacing**: 20px between grid items, 30px vertical padding on body
 
-### Color Palette (variables)
+### Theme System (Light & Dark)
 
+**Light Mode** (default)
 ```css
-:root {
-  --color-bg:         #f0f2f5;
-  --color-surface:    #ffffff;
-  --color-primary:    #4f46e5;   /* indigo — buttons, accents */
-  --color-danger:     #ef4444;   /* red — delete actions */
-  --color-text:       #1e1e2e;
-  --color-muted:      #6b7280;
-  --color-border:     #e5e7eb;
-  --radius:           12px;
-  --shadow:           0 2px 8px rgba(0,0,0,0.08);
-}
+--bg-gradient: linear-gradient(135deg, #f1f5f9, #e2e8f0)
+--card: #ffffff
+--text: #0f172a
+--text-sub: #64748b
+--border: #e2e8f0
+--accent: #0f172a
+--delete: #ef4444
+```
+
+**Dark Mode** (data-theme="dark")
+```css
+--bg-gradient: linear-gradient(135deg, #0f172a, #020617)
+--card: #1e293b
+--text: #f8fafc
+--text-sub: #94a3b8
+--border: #334155
+--accent: #f8fafc
+--delete: #f87171
 ```
 
 ### Typography
 
-- Base font: system UI stack (`-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`).
-- Greeting: `2rem`, bold.
-- Timer display: `4rem`, monospace, bold.
-- Section headings: `1.1rem`, semi-bold.
-- Body / task text: `1rem`.
+- **System fonts**: `system-ui, -apple-system, sans-serif` (no external font files)
+- **Clock**: `clamp(2.2rem, 8vw, 3.5rem)`, bold, responsive scaling
+- **Greeting**: `clamp(1.2rem, 4vw, 1.5rem)`, bold
+- **Date**: `0.9rem`, muted color
+- **Card titles**: `1.1rem`, semi-bold
+- **Body text**: `1rem`, standard weight
 
-### Component Styles
+### Key Component Styles
 
-| Component | Key rules |
+| Component | Rules |
 |---|---|
-| `.container` | `max-width: 680px`, centered, vertical padding |
-| `section` | `background: var(--color-surface)`, `border-radius`, `box-shadow`, `margin-bottom` |
-| `#timer-display` | Large monospace font, changes color (`--color-primary`) when running |
-| `.timer-controls button` | Pill-shaped, distinct colors per action |
-| `#task-list li` | Flex row: checkbox + text + edit/delete icons |
-| `li.completed .task-text` | `text-decoration: line-through; color: var(--color-muted)` |
-| `li.editing .task-text` | Hidden; inline `<input>` shown instead |
-| `.quick-link-btn` | Rounded pill button, `background: var(--color-primary)`, opens in new tab |
-| `.empty-state` | Centered, muted color, italic |
-| `.error-banner` | Red background banner for Local Storage errors |
+| `.header-card` | Centered flex column, contains clock + date + greeting |
+| `.grid` | Two-column responsive grid with gap |
+| `.col-left` | Flex column with gap, timer + quick links |
+| `.col-right` | Full height tasks card |
+| `.card` | Base styled container (background, border, shadow) |
+| `#clock` | Large monospace-style display, accent color |
+| `#timer` | Large countdown display (4rem+), updates color when running |
+| `.btn-primary` | Accent background, white text, hover/active states |
+| `.btn-secondary` | Secondary button (Stop) with gray styling |
+| `.btn-light` | Light button (Reset) with subtle styling |
+| `.theme-toggle-top` | Positioned absolute top-right, 🌙/☀️ emoji button |
+| `.link-item` | Flex row with link button + delete icon (×) |
+| `#todos li` | Flex row with checkbox + text + edit (✏️) + delete (🗑️) icons |
+| `.task-completed` | Applied when task is checked: strikethrough text, muted color |
+| `.form-row` | Flex row with inputs and submit button |
 
 ---
 
 ## JavaScript Architecture (`js/app.js`)
 
-The file is organized into five logical sections with clear comment headers:
+The file uses a functional, modular approach organized by feature:
 
 ```
-1. Constants & State
-2. Local Storage Helpers
-3. Greeting & Clock Module
-4. Timer Module
-5. Task Manager Module
-6. Quick Link Manager Module
-7. Initialization
+1. Local Storage Helpers (get/set)
+2. Time & Clock Module (updateTime)
+3. Timer Module (sec, timerId, fmt, handlers)
+4. Theme Toggle Module (applyTheme)
+5. Quick Links Module (links array, drawLinks)
+6. Task Manager Module (todos array, renderTodos, handlers)
 ```
 
-### 1. Constants & State
+### 1. Local Storage Helpers
 
 ```js
-const STORAGE_KEYS = {
-  TASKS: 'todoapp_tasks',
-  LINKS: 'todoapp_links',
+const get = (k, f) => {
+  try {
+    const val = localStorage.getItem(k);
+    return val ? JSON.parse(val) : f;
+  } catch (e) {
+    return f;  // Return fallback on error
+  }
 };
 
-// Runtime state
-const state = {
-  tasks: [],      // Array of Task objects
-  links: [],      // Array of QuickLink objects
-  timer: {
-    totalSeconds: 25 * 60,   // 1500
-    remaining:   25 * 60,
-    intervalId:  null,
-    isRunning:   false,
-  },
+const set = (k, v) => {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch (e) {}  // Silently fail on quota exceeded
 };
 ```
 
-### 2. Data Models
+### 2. Time & Clock Module
 
-**Task object**
+**Variables**
+- Updates every 1 second via `setInterval(updateTime, 1000)`
+
+**Function: updateTime()**
+- Gets current hour, minutes, seconds
+- Formats and displays in `#clock` (HH:MM:SS, 24-hour format)
+- Formats full date and displays in `#datetime`
+- Determines greeting based on hour:
+  - 5–11: "Good Morning"
+  - 12–17: "Good Afternoon"
+  - 18–4: "Good Evening"
+- Updates `#greeting` element
+
+### 3. Timer Module
+
+**State Variables**
 ```js
-{
-  id:        string,   // crypto.randomUUID() or Date.now().toString()
-  text:      string,
-  completed: boolean,
-  createdAt: number,   // timestamp
-}
+let sec = parseInt(timerInput.value || 25) * 60;  // Seconds remaining
+let timerId = null;  // Interval ID when running
 ```
 
-**QuickLink object**
-```js
-{
-  id:    string,
-  name:  string,
-  url:   string,
-}
-```
+**Function: fmt()**
+- Converts `sec` to "MM:SS" format with leading zeros
+- Updates `#timer` display
 
-### 3. Local Storage Helpers
+**Event Handlers**
 
-```js
-function loadFromStorage(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch (e) {
-    showStorageError();
-    return fallback;
-  }
-}
-
-function saveToStorage(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (e) {
-    showStorageError();
-  }
-}
-```
-
-### 4. Greeting & Clock Module
-
-**Functions**
-
-| Function | Responsibility |
+| Event | Behavior |
 |---|---|
-| `getGreeting(hour)` | Returns `"Good Morning"` / `"Good Afternoon"` / `"Good Evening"` based on hour (0–23) |
-| `formatTime(date)` | Returns `"9:30 AM"` style string |
-| `formatDate(date)` | Returns `"Monday, January 15, 2024"` style string |
-| `updateClock()` | Called every 60 seconds via `setInterval`; updates DOM elements `#greeting-text`, `#current-time`, `#current-date` |
-| `initClock()` | Calls `updateClock()` immediately, then schedules 60-second interval |
+| `timerInput.onchange` | Validate input (1–180 min), update `sec` if timer not running |
+| `#start.onclick` | Start countdown: `setInterval()` decrements sec every 1 second, calls `fmt()` |
+| `#pause.onclick` | Pause: `clearInterval()`, retain current `sec` value |
+| `#reset.onclick` | Reset: `clearInterval()`, set `sec` to input value × 60, call `fmt()` |
 
-**Time-of-day logic**
+**State Machine**
 ```
-hour  5–11  → "Good Morning"
-hour 12–17  → "Good Afternoon"
-hour 18–23 or 0–4 → "Good Evening"
+Stopped  --[Start]--> Running (countdown)
+Running  --[Pause]--> Paused (value retained)
+Any      --[Reset]--> Stopped at input time
+Running @ 00:00  --[auto] --> Stopped + alert("Time's up!")
 ```
 
-### 5. Timer Module
+### 4. Theme Toggle Module
 
-**Functions**
+**Function: applyTheme(theme)**
+- Sets `document.documentElement.setAttribute('data-theme', theme)`
+- Updates button text: '🌙' (light) or '☀️' (dark)
+- Saves preference to `localStorage.theme`
 
-| Function | Responsibility |
-|---|---|
-| `renderTimer()` | Updates `#timer-display` with `MM:SS` from `state.timer.remaining`; toggles `--running` CSS class |
-| `timerTick()` | Decrements `state.timer.remaining`; calls `renderTimer()`; stops at 0 |
-| `startTimer()` | Sets `state.timer.isRunning = true`; starts `setInterval(timerTick, 1000)`; updates button visibility |
-| `stopTimer()` | Clears interval; sets `isRunning = false`; updates button visibility |
-| `resetTimer()` | Calls `stopTimer()`; resets `remaining` to 1500; calls `renderTimer()` |
-| `updateTimerButtons()` | Shows/hides Start and Stop buttons based on `isRunning` |
-| `formatCountdown(seconds)` | Converts seconds to `"MM:SS"` string with leading zeros |
-| `initTimer()` | Renders initial state; attaches click listeners to `#btn-start`, `#btn-stop`, `#btn-reset` |
+**Event Handler**
+- `#theme-toggle.onclick`: Toggles between 'light' and 'dark'
 
-**State transitions**
+### 5. Quick Links Module
+
+**Data Structure**
+```js
+let links = get('links', [
+  {name: 'Google', url: 'https://google.com'},
+  {name: 'Gmail', url: 'https://gmail.com'},
+  {name: 'Calendar', url: 'https://calendar.google.com'}
+]);
 ```
-Stopped  --[Start click]--> Running
-Running  --[Stop click] --> Paused (stopped at current value)
-Paused   --[Start click]--> Running (resumes from paused value)
-Any      --[Reset click]--> Stopped at 25:00
-Running  --[reaches 0]  --> Stopped at 00:00
-```
+
+**Function: drawLinks()**
+- Clears `#links` container
+- For each link in array:
+  - Creates `<div class="link-item">`
+  - Adds `<a>` with `target="_blank"`, `rel="noopener noreferrer"`
+  - Adds delete button (×) with onclick handler to remove link, save, and re-render
+
+**Event Handlers**
+- `#link-form.onsubmit`:
+  - Validate inputs (trim both name and URL, reject if empty)
+  - Create link object: `{name, url}`
+  - Push to `links` array
+  - Call `set('links', links)`
+  - Call `drawLinks()`
+  - Clear input fields
 
 ### 6. Task Manager Module
 
-**Functions**
-
-| Function | Responsibility |
-|---|---|
-| `loadTasks()` | Reads `state.tasks` from Local Storage |
-| `saveTasks()` | Writes `state.tasks` to Local Storage |
-| `renderTasks()` | Clears `#task-list`, renders each task as `<li>`; shows/hides empty state |
-| `createTaskElement(task)` | Returns a fully formed `<li>` DOM node for a task |
-| `addTask(text)` | Validates input; pushes new Task to `state.tasks`; calls `saveTasks()` + `renderTasks()` |
-| `deleteTask(id)` | Filters task out of `state.tasks`; calls `saveTasks()` + `renderTasks()` |
-| `toggleTask(id)` | Flips `completed`; calls `saveTasks()` + `renderTasks()` |
-| `startEditTask(id)` | Replaces task text span with an inline `<input>` pre-filled with current text |
-| `saveEditTask(id, newText)` | Validates; updates text in `state.tasks`; calls `saveTasks()` + `renderTasks()` |
-| `cancelEditTask()` | Re-renders without saving |
-| `initTasks()` | Loads tasks; renders; attaches listener to `#btn-add-task` and `#task-input` (keydown Enter) |
-
-**Task list item HTML structure**
-```html
-<li data-id="{id}" class="task-item [completed] [editing]">
-  <input type="checkbox" class="task-checkbox" [checked] />
-  <span class="task-text">{text}</span>
-  <!-- in edit mode, span is replaced with: -->
-  <!-- <input class="task-edit-input" value="{text}" /> -->
-  <div class="task-actions">
-    <button class="btn-edit">✏️</button>
-    <button class="btn-delete">🗑️</button>
-  </div>
-</li>
-```
-
-**Inline editing flow**
-1. User clicks ✏️ → `startEditTask(id)` replaces `.task-text` span with `<input>`.
-2. User presses Enter or clicks a Save button → `saveEditTask(id, input.value)`.
-3. User presses Escape → `cancelEditTask()` re-renders the list unchanged.
-
-### 7. Quick Link Manager Module
-
-**Functions**
-
-| Function | Responsibility |
-|---|---|
-| `loadLinks()` | Reads `state.links` from Local Storage |
-| `saveLinks()` | Writes `state.links` to Local Storage |
-| `renderLinks()` | Clears `#links-list`; renders each link as a button + delete icon; shows/hides empty state |
-| `addLink(name, url)` | Validates inputs; pushes new QuickLink; calls `saveLinks()` + `renderLinks()` |
-| `deleteLink(id)` | Filters link out; calls `saveLinks()` + `renderLinks()` |
-| `initLinks()` | Loads links; renders; attaches listener to `#btn-add-link` |
-
-**Quick link item HTML structure**
-```html
-<div class="link-item" data-id="{id}">
-  <a href="{url}" target="_blank" rel="noopener noreferrer" class="quick-link-btn">{name}</a>
-  <button class="btn-delete-link">✕</button>
-</div>
-```
-
-### 8. Validation
-
-Both `addTask` and `addLink` trim their inputs before checking. If empty:
-- An inline validation message (`<p class="validation-msg">`) is appended below the input row.
-- The message is removed on the next valid submission or on input focus.
-
-### 9. Initialization
-
+**Data Structure**
 ```js
-document.addEventListener('DOMContentLoaded', () => {
-  initClock();
-  initTimer();
-  initTasks();
-  initLinks();
-});
+let todos = get('todos', []);
+
+// Task object: { id, text, completed }
+// ID generated as unique string (Date.now() or crypto.randomUUID())
 ```
+
+**Function: renderTodos()**
+- Clears `#todos` list
+- For each task in array:
+  - Creates `<li data-id="{id}" class="task-item">` (add class `completed` if task.completed)
+  - Checkbox (checked state reflects task.completed)
+  - Span with task text
+  - Edit button (✏️)
+  - Delete button (🗑️)
+- Show/hide empty state message
+
+**Event Handlers & Functions**
+
+| Handler | Behavior |
+|---|---|
+| Checkbox.onclick | Call `toggleTodo(id)` |
+| Edit button.onclick | Call `startEdit(id)` |
+| Delete button.onclick | Call `deleteTodo(id)` |
+| `#todo-form.onsubmit` | Call `addTodo(input value)`, clear input |
+
+**Function: addTodo(text)**
+- Trim input, reject if empty
+- Create task: `{id: unique ID, text, completed: false}`
+- Push to `todos` array
+- Call `set('todos', todos)` + `renderTodos()`
+
+**Function: toggleTodo(id)**
+- Find task, flip `completed` boolean
+- Call `set('todos', todos)` + `renderTodos()`
+
+**Function: deleteTodo(id)**
+- Remove task from array
+- Call `set('todos', todos)` + `renderTodos()`
+
+**Function: startEdit(id)**
+- Find task element in DOM
+- Replace `.task-text` span with `<input>` pre-filled with current text
+- Attach keydown handlers:
+  - Enter: `saveEdit(id, input.value)`
+  - Escape: `renderTodos()` (cancel without saving)
+
+**Function: saveEdit(id, newText)**
+- Trim, reject if empty
+- Find task, update text
+- Call `set('todos', todos)` + `renderTodos()`
 
 ---
 
 ## Local Storage Schema
 
-| Key | Type | Example value |
+| Key | Type | Example |
 |---|---|---|
-| `todoapp_tasks` | JSON Array of Task | `[{"id":"abc","text":"Buy milk","completed":false,"createdAt":1700000000000}]` |
-| `todoapp_links` | JSON Array of QuickLink | `[{"id":"xyz","name":"GitHub","url":"https://github.com"}]` |
+| `todos` | JSON Array | `[{"id":"123","text":"Buy milk","completed":false}]` |
+| `links` | JSON Array | `[{"name":"Google","url":"https://google.com"}]` |
+| `theme` | String | `"light"` or `"dark"` |
 
 ---
 
 ## Error Handling
 
-- `loadFromStorage` wraps `JSON.parse` in try/catch. On failure, returns the fallback value and shows a dismissable error banner at the top of the page.
-- `saveToStorage` wraps `localStorage.setItem` in try/catch (handles quota exceeded). Shows the same error banner.
-- Error banner HTML: `<div id="storage-error-banner" class="error-banner hidden">⚠️ Could not access Local Storage. Data may not be saved.</div>`
+- **Storage read error**: `get()` returns fallback (empty array), no crash
+- **Storage write error**: `set()` silently catches exception, data lost for that operation
+- **Quota exceeded**: Same as write error, silently caught
+- **Invalid timer input**: Clamped to 1–180 minutes
+- **Empty form inputs**: Validation prevents submission, user sees validation feedback
 
 ---
 
-## Requirement Traceability
+## Browser Support
 
-| Requirement | Covered by |
-|---|---|
-| R1 – Time & Date display | `updateClock`, `formatTime`, `formatDate` |
-| R2 – Time-based greeting | `getGreeting` |
-| R3 – Create tasks | `addTask`, `#btn-add-task`, Enter keydown |
-| R4 – Edit tasks | `startEditTask`, `saveEditTask`, `cancelEditTask` |
-| R5 – Mark complete | `toggleTask`, checkbox, `.completed` CSS class |
-| R6 – Delete tasks | `deleteTask`, `.btn-delete` |
-| R7 – Persist tasks | `loadTasks`, `saveTasks`, `todoapp_tasks` key |
-| R8 – Timer display | `renderTimer`, `formatCountdown` |
-| R9 – Timer start | `startTimer`, `#btn-start` |
-| R10 – Timer stop | `stopTimer`, `#btn-stop` |
-| R11 – Timer reset | `resetTimer`, `#btn-reset` |
-| R12 – Add quick links | `addLink`, `#btn-add-link` |
-| R13 – Delete quick links | `deleteLink`, `.btn-delete-link` |
-| R14 – Persist quick links | `loadLinks`, `saveLinks`, `todoapp_links` key |
-| R15 – Responsive UI | CSS flexbox/grid, immediate DOM updates |
-| R16 – Browser compatibility | Standard HTML5/CSS3/ES6+, no polyfills |
-| R17 – Visual design | CSS variables, card layout, WCAG-compliant contrast |
-| R18 – Code organization | Single CSS + single JS file, descriptive naming |
-| R19 – Initial load state | `initClock`, `initTimer`, `initTasks`, `initLinks` in `DOMContentLoaded` |
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- All modern browsers with ES6+ and `localStorage` support
+- No polyfills required
+
+---
+
+## Performance Targets
+
+- Page load: < 2 seconds
+- Clock update: Every 1 second (smooth, no jank)
+- Timer update: Every 1 second, accurate countdown
+- DOM update latency: < 100ms for user interactions
+- Theme toggle: Instant (CSS-only switch via data attribute)
