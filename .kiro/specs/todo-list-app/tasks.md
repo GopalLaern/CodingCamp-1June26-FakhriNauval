@@ -1,213 +1,520 @@
-# Implementation Plan
+# Implementation Tasks
 
 ## Overview
 
-This plan implements a To-Do List Web Application with vanilla HTML, CSS, and JavaScript. The app includes a time-based greeting, 25-minute focus timer, task management with local persistence, and quick links to favorite websites.
+This plan outlines the implementation of Dashboard Focus with a header + two-column grid layout (desktop) / single-column (mobile). The app combines a real-time clock, Pomodoro timer, task manager, and quick links, all persisted in Local Storage.
 
-## Tasks
+---
 
-- [ ] 1. Set up project structure and HTML skeleton
-  - Create the basic file structure (`index.html`, `css/style.css`, `js/app.js`) and complete HTML5 document with semantic sections for greeting, timer, tasks, and quick links. Include all required IDs, input fields, buttons, and empty state messages.
-  - File structure created: `index.html`, `css/style.css`, `js/app.js`
-  - HTML5 document with proper `<!DOCTYPE>` and meta tags
-  - Container div with four sections: greeting, timer, tasks, quick links
-  - All required IDs present: `#greeting-text`, `#current-time`, `#current-date`, `#timer-display`, `#task-list`, `#links-list`
-  - Input fields for tasks and quick links with appropriate placeholders
-  - Buttons for all actions: Add task, Add link, Start/Stop/Reset timer
-  - Empty state messages for tasks and links sections
-  - Links to `css/style.css` and `js/app.js` in the HTML head and body
+## Task List
 
-- [ ] 2. Implement CSS styling and layout
-  - Create a clean, minimal, single-column responsive layout with CSS custom properties for theming. Style all components with clear visual hierarchy, WCAG AA contrast ratios, and responsive adjustments for smaller viewports.
-  - CSS custom properties defined for colors, spacing, border-radius, shadows
-  - System font stack applied to body
-  - Centered container with max-width 680px
-  - Each section styled as a card with background, border-radius, box-shadow
-  - Typography hierarchy: greeting (2rem), timer (4rem monospace), headings (1.1rem)
-  - Button styles: primary (indigo), danger (red), with hover states
-  - Task items styled as flex rows with checkbox, text, and action buttons
-  - Completed task style: strikethrough text, muted color
-  - Quick link buttons styled as rounded pills
-  - Empty state messages centered and muted
-  - Responsive layout adjusts for smaller viewports
-  - WCAG AA contrast ratios met for all text/background combinations
+### Phase 1: Project Setup & Structure
 
-- [ ] 3. Initialize JavaScript structure and constants
-  - Set up the JavaScript file with proper structure, `STORAGE_KEYS` constant, global `state` object (tasks, links, timer), and Local Storage helper functions with error handling.
-  - `STORAGE_KEYS` constant defined with `TASKS` and `LINKS` keys
-  - Global `state` object with `tasks`, `links`, and `timer` properties
-  - Timer state includes `totalSeconds`, `remaining`, `intervalId`, `isRunning`
-  - File organized with comment headers for each module
-  - `DOMContentLoaded` event listener that calls init functions
-  - Helper functions `loadFromStorage` and `saveToStorage` implemented with try/catch
-  - `showStorageError` function displays error banner when Local Storage fails
+#### Task 1.1: Create project structure and HTML skeleton
 
-- [ ] 4. Implement greeting and clock functionality
-  - Create functions to display current time (12-hour format with AM/PM), date (full format), and time-based greeting that updates every minute.
-  - `getGreeting(hour)` returns correct greeting based on hour: Morning (5-11), Afternoon (12-17), Evening (18-4)
-  - `formatTime(date)` returns 12-hour format with AM/PM (e.g., "9:30 AM")
-  - `formatDate(date)` returns full date string (e.g., "Monday, January 15, 2024")
-  - `updateClock()` updates DOM elements `#greeting-text`, `#current-time`, `#current-date`
-  - `initClock()` calls `updateClock()` immediately and sets 60-second interval
-  - Greeting, time, and date display correctly on page load
-  - Clock updates at least once per minute automatically
+- **Objective**: Establish basic file structure and complete HTML document
+- **Deliverables**:
+  - Create `index.html` with proper HTML5 doctype and meta tags
+  - Create `css/style.css` (empty, placeholder)
+  - Create `js/app.js` (empty, placeholder)
+  - Implement header card with:
+    - Theme toggle button (top-right, absolute position)
+    - Clock display div (#clock)
+    - Date display div (#datetime)
+    - Greeting div (#greeting)
+  - Implement two-column grid with:
+    - Left column (.col-left) containing:
+      - Focus Timer section (card class)
+      - Quick Links section (card class)
+    - Right column (.col-right) containing:
+      - Tasks section (card class, tasks-card class)
+  - All required input IDs: #timer-min, #link-name, #link-url, #todo-input
+  - All required button IDs: #start, #pause, #reset, for form submits
+  - Container setup with .container and .grid classes
+  - Link stylesheet and script in HTML head/body
+- **Status**: [ ] Pending
 
-- [ ] 5. Implement timer display and countdown logic
-  - Create the 25-minute countdown timer with display formatting and tick logic.
-  - `formatCountdown(seconds)` converts seconds to "MM:SS" format with leading zeros
-  - `renderTimer()` updates `#timer-display` with formatted time from `state.timer.remaining`
-  - `renderTimer()` toggles CSS class when timer is running for visual feedback
-  - `timerTick()` decrements `remaining` by 1 second and calls `renderTimer()`
-  - `timerTick()` stops when `remaining` reaches 0
-  - Timer displays "25:00" on initial page load
+#### Task 1.2: Verify HTML structure and element IDs
 
-- [ ] 6. Implement timer controls (Start, Stop, Reset)
-  - Add functionality for Start, Stop, and Reset buttons with proper state management and button visibility.
-  - `startTimer()` sets `isRunning` to true, starts 1-second interval, updates button visibility
-  - `stopTimer()` clears interval, sets `isRunning` to false, updates button visibility
-  - `resetTimer()` calls `stopTimer()`, resets `remaining` to 1500, calls `renderTimer()`
-  - `updateTimerButtons()` shows Start when stopped, shows Stop when running
-  - Reset button is always visible
-  - Click handlers attached to `#btn-start`, `#btn-stop`, `#btn-reset`
-  - Timer can be started from 25:00, paused, resumed from paused time, and reset at any point
-  - Timer stops automatically when reaching 00:00
+- **Objective**: Ensure all elements match implementation requirements
+- **Checklist**:
+  - [ ] #clock, #datetime, #greeting in header
+  - [ ] #timer-min input with default value="25"
+  - [ ] #start, #pause, #reset buttons
+  - [ ] #timer display div
+  - [ ] #link-name, #link-url inputs
+  - [ ] #links container
+  - [ ] #todo-input input
+  - [ ] #todos list container
+  - [ ] #theme-toggle button
+  - [ ] Proper HTML5 structure with head/body/meta tags
+- **Status**: [ ] Pending
 
-- [ ] 7. Implement task data persistence (Local Storage)
-  - Create functions to load and save tasks array to/from Local Storage with error handling.
-  - `loadTasks()` calls `loadFromStorage` with `STORAGE_KEYS.TASKS` and empty array fallback
-  - `loadTasks()` populates `state.tasks` with loaded data
-  - `saveTasks()` calls `saveToStorage` with `STORAGE_KEYS.TASKS` and current `state.tasks`
-  - Error handling displays error banner if Local Storage read/write fails
-  - Tasks persist across browser sessions when page is closed and reopened
-  - Corrupted Local Storage data defaults to empty array without crashing
+---
 
-- [ ] 8. Implement task rendering and display
-  - Create functions to render the task list to the DOM, including task items and empty state.
-  - `renderTasks()` clears `#task-list` and iterates over `state.tasks`
-  - `createTaskElement(task)` returns a complete `<li>` with checkbox, text, edit, and delete buttons
-  - Completed tasks display with strikethrough text and checked checkbox
-  - Empty state message `#task-empty-state` shows when `state.tasks` is empty, hidden otherwise
-  - Task list displays all saved tasks on page load
-  - Each task item has `data-id` attribute matching task ID
+### Phase 2: CSS Styling
 
-- [ ] 9. Implement add task functionality
-  - Enable users to create new tasks via input field and Add button, with validation and persistence.
-  - `addTask(text)` validates input (trims whitespace, rejects empty strings)
-  - `addTask(text)` creates new task object with unique ID, text, completed:false, createdAt timestamp
-  - `addTask(text)` pushes task to `state.tasks`, calls `saveTasks()` and `renderTasks()`
-  - Empty/whitespace-only input displays inline validation message
-  - Click handler on `#btn-add-task` calls `addTask()` with input value
-  - Enter keydown in `#task-input` calls `addTask()` with input value
-  - Input field clears after successful task creation
-  - New task appears in list immediately without page refresh
+#### Task 2.1: Implement CSS variables and base styling
 
-- [ ] 10. Implement toggle task completion
-  - Allow users to mark tasks as complete/incomplete by clicking the checkbox.
-  - `toggleTask(id)` finds task in `state.tasks` and flips its `completed` boolean
-  - `toggleTask(id)` calls `saveTasks()` and `renderTasks()`
-  - Click handler on `.task-checkbox` calls `toggleTask()` with task ID
-  - Completed tasks immediately display with strikethrough styling
-  - Uncompleting a task removes strikethrough and restores normal appearance
-  - Completion state persists in Local Storage
+- **Objective**: Set up color palette and base responsive layout
+- **Deliverables**:
+  - Define CSS custom properties (--bg-gradient, --card, --text, --text-sub, --border, --accent, --delete, etc.)
+  - Implement light mode (default) and dark mode (data-theme="dark" selector)
+  - Body: gradient background, min-height 100vh, centered flex layout, padding responsive
+  - Reset default margins/padding with \* { box-sizing: border-box }
+  - Font stack: system-ui, -apple-system, sans-serif
+  - Container: max-width 960px, centered, flex column, gap 20px
+- **Status**: [ ] Pending
 
-- [ ] 11. Implement delete task functionality
-  - Enable users to remove tasks from the list with immediate UI update and persistence.
-  - `deleteTask(id)` filters task out of `state.tasks`
-  - `deleteTask(id)` calls `saveTasks()` and `renderTasks()`
-  - Click handler on `.btn-delete` calls `deleteTask()` with task ID
-  - Task is removed from display immediately
-  - Empty state message appears when last task is deleted
-  - Deletion persists in Local Storage
+#### Task 2.2: Implement header styling
 
-- [ ] 12. Implement edit task functionality
-  - Allow users to edit task text inline with Enter to save, Escape to cancel.
-  - `startEditTask(id)` replaces `.task-text` span with `<input>` pre-filled with current text
-  - `saveEditTask(id, newText)` validates new text, updates task in `state.tasks`, calls `saveTasks()` and `renderTasks()`
-  - `cancelEditTask()` calls `renderTasks()` without saving
-  - Click handler on `.btn-edit` calls `startEditTask()` with task ID
-  - Enter keydown in edit input calls `saveEditTask()`
-  - Escape keydown in edit input calls `cancelEditTask()`
-  - Empty/whitespace-only edited text shows validation message and doesn't save
-  - Edited text updates in UI immediately after saving
+- **Objective**: Style the top header card with clock, date, greeting
+- **Deliverables**:
+  - `.header-card`: centered flex column, gap 8px, padding 30px 20px
+  - `#clock`: `clamp(2.2rem, 8vw, 3.5rem)`, bold, accent color, letter-spacing -1px
+  - `#datetime`: `0.9rem`, muted color
+  - `#greeting`: `clamp(1.2rem, 4vw, 1.5rem)`, bold
+  - `.theme-toggle-top`: positioned absolute top-right, emoji button (🌙/☀️), no background
+  - Responsive: adjust font sizes on mobile
+- **Status**: [ ] Pending
 
-- [ ] 13. Implement quick links data persistence (Local Storage)
-  - Create functions to load and save quick links array to/from Local Storage.
-  - `loadLinks()` calls `loadFromStorage` with `STORAGE_KEYS.LINKS` and empty array fallback
-  - `loadLinks()` populates `state.links` with loaded data
-  - `saveLinks()` calls `saveToStorage` with `STORAGE_KEYS.LINKS` and current `state.links`
-  - Error handling displays error banner if Local Storage fails
-  - Quick links persist across browser sessions
-  - Corrupted Local Storage data defaults to empty array
+#### Task 2.3: Implement grid layout and column styling
 
-- [ ] 14. Implement quick links rendering and display
-  - Render quick link buttons to the DOM with proper attributes for external links and empty state.
-  - `renderLinks()` clears `#links-list` and iterates over `state.links`
-  - Each link rendered as `<a>` button with `target="_blank"` and `rel="noopener noreferrer"`
-  - Each link has associated delete button with `data-id` attribute
-  - Empty state message `#links-empty-state` shows when `state.links` is empty, hidden otherwise
-  - All saved links display on page load
-  - Links open in new tab when clicked
+- **Objective**: Create responsive two-column layout
+- **Deliverables**:
+  - `.grid`: `display: grid; grid-template-columns: 1.1fr 1fr` (desktop)
+  - `.grid`: `grid-template-columns: 1fr` on @media (max-width: 768px)
+  - Gap: 20px
+  - `.col-left`: flex column, gap 20px
+  - `.col-right`: full height
+  - `.card`: background var(--card), border 1px var(--border), border-radius 12px, padding 24px, subtle shadow
+  - Responsive padding on smaller screens (@media max-width: 480px, 600px)
+- **Status**: [ ] Pending
 
-- [ ] 15. Implement add quick link functionality
-  - Enable users to create new quick links with name and URL validation and persistence.
-  - `addLink(name, url)` validates both inputs (trims whitespace, rejects empty strings)
-  - `addLink(name, url)` creates new link object with unique ID, name, url
-  - `addLink(name, url)` pushes link to `state.links`, calls `saveLinks()` and `renderLinks()`
-  - Empty/whitespace input displays inline validation message
-  - Click handler on `#btn-add-link` calls `addLink()` with both input values
-  - Input fields clear after successful link creation
-  - New link appears in list immediately without page refresh
+#### Task 2.4: Style timer section
 
-- [ ] 16. Implement delete quick link functionality
-  - Allow users to remove quick links with immediate UI update and persistence.
-  - `deleteLink(id)` filters link out of `state.links`
-  - `deleteLink(id)` calls `saveLinks()` and `renderLinks()`
-  - Click handler on `.btn-delete-link` calls `deleteLink()` with link ID
-  - Link is removed from display immediately
-  - Empty state message appears when last link is deleted
-  - Deletion persists in Local Storage
+- **Objective**: Format timer display and controls
+- **Deliverables**:
+  - `#timer`: large display, `font-size: 4rem+`, bold, center aligned
+  - `.timer-setup`: label + input for minutes configuration
+  - Button styles: `.btn-primary` (primary color), `.btn-secondary` (Stop button), `.btn-light` (Reset)
+  - Flex row for buttons: `.flex-row`, centered, gap
+  - Hover/active states for buttons
+- **Status**: [ ] Pending
 
-- [ ] 17. Add responsive CSS and cross-browser testing
-  - Ensure the application is responsive and works correctly in all modern browsers.
-  - Application tested in Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
-  - All features work identically across tested browsers
-  - Layout adjusts properly on viewports from 320px to 1920px wide
-  - No horizontal scroll at any viewport size
-  - Touch interactions work on mobile/tablet devices
-  - No JavaScript polyfills or browser-specific hacks required
+#### Task 2.5: Style task list section
 
-- [ ] 18. Final polish and code cleanup
-  - Clean up code, ensure organization standards are met, verify all requirements, and test edge cases.
-  - Only 1 CSS file in `css/` directory
-  - Only 1 JavaScript file in `js/` directory
-  - No commented-out code or console.log statements
-  - All functions have descriptive names
-  - CSS is organized with clear sections for each component
-  - All 19 requirements from requirements.md are met and verified
-  - Local Storage quota exceeded scenario handled gracefully
-  - Application loads in under 2 seconds
-  - All interactions respond within 100ms
-  - README.md updated with project description and usage instructions
+- **Objective**: Format task list items and form
+- **Deliverables**:
+  - `#todo-form`: flex row with input + button, gap, responsive width
+  - `#todos li`: flex row with checkbox, text, action buttons
+  - `.task-text`: flex-grow 1, normal text color
+  - `li.completed .task-text`: text-decoration line-through, muted color
+  - Checkbox: standard style, responsive size
+  - Edit (✏️) and Delete (🗑️) buttons: icons, hover effects
+  - Responsive list on mobile
+- **Status**: [ ] Pending
+
+#### Task 2.6: Style quick links section
+
+- **Objective**: Format quick links display and form
+- **Deliverables**:
+  - `#link-form`: flex row with inputs + button
+  - `.link-item`: flex row with link button + delete button
+  - Link button: styled as pill button, accent background, white text, opens in new tab
+  - Delete button (×): hover effect, easy to tap on mobile
+  - Responsive layout for smaller screens
+- **Status**: [ ] Pending
+
+#### Task 2.7: Add responsive design and polish
+
+- **Objective**: Ensure mobile/tablet responsiveness
+- **Deliverables**:
+  - Test on 320px, 480px, 768px, 1024px, 1920px viewports
+  - Adjust font sizes with clamp() for smooth scaling
+  - Ensure no horizontal overflow at any width
+  - Touch-friendly button sizes (min 44px height on mobile)
+  - Readable contrast ratios (WCAG AA minimum)
+  - Test in light and dark modes
+- **Status**: [ ] Pending
+
+---
+
+### Phase 3: JavaScript – Foundation & Utilities
+
+#### Task 3.1: Set up Local Storage helpers and initialization
+
+- **Objective**: Create reusable storage utility functions
+- **Deliverables**:
+  - `const get(k, f)`: Read from localStorage, parse JSON, return fallback if error or missing
+  - `const set(k, v)`: Write to localStorage, stringify JSON, silently fail on error
+  - Initialize DOM element references (cache selectors)
+  - Add minimal error handling (try/catch in get/set)
+  - Set up initial state objects: `let todos = []`, `let links = []`, `let sec`, `let timerId`
+- **Status**: [ ] Pending
+
+#### Task 3.2: Implement real-time clock and greeting
+
+- **Objective**: Display current time, date, and time-based greeting
+- **Deliverables**:
+  - `function updateTime()`:
+    - Get current Date object
+    - Format time: HH:MM:SS (24-hour format) → #clock
+    - Format date: "Monday, January 15, 2024" → #datetime
+    - Determine greeting based on hour (5–11 → Morning, 12–17 → Afternoon, 18–4 → Evening)
+    - Update #greeting
+  - Call `updateTime()` immediately on page load
+  - Schedule `setInterval(updateTime, 1000)` to update every second
+- **Status**: [ ] Pending
+
+#### Task 3.3: Implement timer display formatting
+
+- **Objective**: Create timer display and format countdown
+- **Deliverables**:
+  - `function fmt()`: Convert `sec` to "MM:SS" with leading zeros, update #timer display
+  - Initialize `sec = 25 * 60` (1500 seconds)
+  - Initialize `timerId = null` (no interval running initially)
+  - Display "25:00" on page load
+- **Status**: [ ] Pending
+
+---
+
+### Phase 4: JavaScript – Timer Functionality
+
+#### Task 4.1: Implement timer start, pause, reset handlers
+
+- **Objective**: Add timer control event listeners
+- **Deliverables**:
+  - `#start.onclick`: If timerId is null, start `setInterval()` that decrements `sec` every 1 second
+    - When `sec` reaches 0, `clearInterval()`, show alert "Time's up!"
+  - `#pause.onclick`: `clearInterval(timerId)`, set `timerId = null`, retain current `sec` value
+  - `#reset.onclick`: `clearInterval(timerId)`, set `timerId = null`, set `sec = timerInput.value * 60`, call `fmt()`
+  - Attach event listeners on page load
+- **Status**: [ ] Pending
+
+#### Task 4.2: Implement timer input validation
+
+- **Objective**: Allow user to customize timer duration
+- **Deliverables**:
+  - `#timer-min.onchange`:
+    - Get input value, validate (parse to int, check 1 ≤ value ≤ 180)
+    - Clamp to valid range if out of bounds
+    - If `timerId` is null (not running), update `sec = value * 60` and call `fmt()`
+  - Default input value: 25
+- **Status**: [ ] Pending
+
+#### Task 4.3: Test timer state machine
+
+- **Objective**: Verify timer transitions work correctly
+- **Checklist**:
+  - [ ] Timer displays "25:00" on load
+  - [ ] Click Start: timer counts down
+  - [ ] Click Pause: timer stops at current value
+  - [ ] Click Start again: timer resumes from paused value
+  - [ ] Click Reset: timer returns to input value × 60
+  - [ ] Change input while stopped: display updates
+  - [ ] Timer auto-stops at "00:00" with alert
+- **Status**: [ ] Pending
+
+---
+
+### Phase 5: JavaScript – Theme Toggle
+
+#### Task 5.1: Implement theme toggle
+
+- **Objective**: Add light/dark mode switching
+- **Deliverables**:
+  - `function applyTheme(theme)`:
+    - Set `document.documentElement.setAttribute('data-theme', theme)`
+    - Update `#theme-toggle.textContent` to '🌙' (light) or '☀️' (dark)
+    - Save `theme` to `localStorage.theme`
+  - `#theme-toggle.onclick`: Toggle between 'light' and 'dark'
+  - On page load: restore theme from localStorage or default to 'light'
+  - Call `applyTheme()` with restored theme
+- **Status**: [ ] Pending
+
+---
+
+### Phase 6: JavaScript – Quick Links Module
+
+#### Task 6.1: Load and render quick links
+
+- **Objective**: Display saved quick links with delete functionality
+- **Deliverables**:
+  - Load from storage: `let links = get('links', [{name: 'Google', url: 'https://google.com'}, ...default links...])`
+  - `function drawLinks()`:
+    - Clear #links container
+    - For each link in array:
+      - Create `<div class="link-item">`
+      - Create `<a>` with `href={url}`, `target="_blank"`, `rel="noopener noreferrer"`, text={name}
+      - Create delete button (×) with onclick handler:
+        - Remove link from array
+        - Call `set('links', links)`
+        - Call `drawLinks()`
+    - Append to #links
+  - Call `drawLinks()` on page load
+- **Status**: [ ] Pending
+
+#### Task 6.2: Implement add quick link functionality
+
+- **Objective**: Allow users to create new quick links
+- **Deliverables**:
+  - `#link-form.onsubmit`:
+    - Get #link-name and #link-url values
+    - Trim both inputs
+    - Validate: reject if either is empty
+    - Create link object: `{name, url}`
+    - Push to `links` array
+    - Call `set('links', links)`
+    - Call `drawLinks()`
+    - Clear input fields
+    - Prevent default form submission
+  - Attach listener on page load
+- **Status**: [ ] Pending
+
+---
+
+### Phase 7: JavaScript – Task Manager Module
+
+#### Task 7.1: Load and render tasks
+
+- **Objective**: Display saved tasks with checkboxes, edit, and delete buttons
+- **Deliverables**:
+  - Load from storage: `let todos = get('todos', [])`
+  - `function renderTodos()`:
+    - Clear #todos list
+    - For each task in array:
+      - Create `<li data-id={id}>`
+      - If task.completed, add class `completed`
+      - Create checkbox with `checked={task.completed}`
+      - Create span with task.text
+      - Create edit button (✏️)
+      - Create delete button (🗑️)
+      - Append to #todos
+    - Show/hide empty state message
+  - Call `renderTodos()` on page load
+- **Status**: [ ] Pending
+
+#### Task 7.2: Implement add task functionality
+
+- **Objective**: Allow users to create new tasks
+- **Deliverables**:
+  - `#todo-form.onsubmit`:
+    - Get #todo-input value
+    - Trim input
+    - Validate: reject if empty
+    - Create task object: `{id: unique ID, text, completed: false}`
+      - ID can be: `Date.now().toString()` or `crypto.randomUUID()` (if available)
+    - Push to `todos` array
+    - Call `set('todos', todos)`
+    - Call `renderTodos()`
+    - Clear #todo-input
+    - Prevent default form submission
+  - Attach listener on page load
+  - Also attach Enter keydown handler to #todo-input
+- **Status**: [ ] Pending
+
+#### Task 7.3: Implement toggle task completion
+
+- **Objective**: Allow users to mark tasks complete/incomplete
+- **Deliverables**:
+  - Attach checkbox change listener to each task:
+    - Get task ID from li[data-id]
+    - Find task in `todos` array by ID
+    - Flip `task.completed` boolean
+    - Call `set('todos', todos)`
+    - Call `renderTodos()`
+  - Must be re-attached after each `renderTodos()` call or use event delegation
+- **Status**: [ ] Pending
+
+#### Task 7.4: Implement delete task functionality
+
+- **Objective**: Allow users to remove tasks
+- **Deliverables**:
+  - Attach delete button listener to each task:
+    - Get task ID from li[data-id]
+    - Filter task from `todos` array (remove by ID)
+    - Call `set('todos', todos)`
+    - Call `renderTodos()`
+  - Re-attach after each `renderTodos()` call or use event delegation
+- **Status**: [ ] Pending
+
+#### Task 7.5: Implement edit task functionality
+
+- **Objective**: Allow inline editing of task text
+- **Deliverables**:
+  - Attach edit button listener to each task:
+    - `function startEdit(id)`:
+      - Find task span (.task-text) in DOM
+      - Replace span with `<input>` pre-filled with current task text
+      - Focus on input
+      - Attach keydown listeners:
+        - Enter: save
+        - Escape: cancel
+  - `function saveEdit(id, newText)`:
+    - Trim newText
+    - Validate: reject if empty
+    - Find task in array by ID
+    - Update task.text
+    - Call `set('todos', todos)`
+    - Call `renderTodos()`
+  - `function cancelEdit()`:
+    - Call `renderTodos()` without saving
+  - Re-attach after each `renderTodos()` call
+- **Status**: [ ] Pending
+
+#### Task 7.6: Test task manager state
+
+- **Objective**: Verify task operations work correctly
+- **Checklist**:
+  - [ ] Tasks display on load
+  - [ ] Add task: appears immediately in list
+  - [ ] Toggle checkbox: task styled as completed (strikethrough)
+  - [ ] Edit task: click pencil, edit text, press Enter to save
+  - [ ] Edit task: press Escape to cancel
+  - [ ] Delete task: click trash, task removed
+  - [ ] Empty state shows when all tasks deleted
+  - [ ] Refresh page: tasks persist
+- **Status**: [ ] Pending
+
+---
+
+### Phase 8: Integration & Testing
+
+#### Task 8.1: Test light/dark theme switching
+
+- **Objective**: Verify theme toggle works end-to-end
+- **Checklist**:
+  - [ ] Page loads in light mode by default
+  - [ ] Click theme button: switches to dark mode
+  - [ ] All elements have sufficient contrast in both modes
+  - [ ] Refresh page: theme persists
+  - [ ] Theme button icon updates (🌙 ↔ ☀️)
+- **Status**: [ ] Pending
+
+#### Task 8.2: Test responsive layout
+
+- **Objective**: Verify layout works on all viewport sizes
+- **Checklist**:
+  - [ ] Desktop (1024px+): two-column grid visible
+  - [ ] Tablet (768px): single-column layout
+  - [ ] Mobile (320px): no horizontal scroll, all sections visible
+  - [ ] Text sizes responsive via clamp()
+  - [ ] Touch targets >= 44px on mobile
+- **Status**: [ ] Pending
+
+#### Task 8.3: Test Local Storage persistence
+
+- **Objective**: Verify data persists across sessions
+- **Checklist**:
+  - [ ] Add task, close browser tab, reopen: task persists
+  - [ ] Add quick link, refresh page: link persists
+  - [ ] Change timer minutes, refresh: value persists (NOTE: only while stopped)
+  - [ ] Change theme, refresh: theme persists
+  - [ ] Delete task, refresh: deletion persists
+- **Status**: [ ] Pending
+
+#### Task 8.4: Test error handling
+
+- **Objective**: Verify app handles errors gracefully
+- **Checklist**:
+  - [ ] Enter invalid timer value: clamps to 1–180
+  - [ ] Try to add empty task: rejected (no change)
+  - [ ] Disable Local Storage in DevTools: app still works with empty data
+  - [ ] Clear Local Storage: app shows empty state on next load
+- **Status**: [ ] Pending
+
+#### Task 8.5: Test browser compatibility
+
+- **Objective**: Verify app works on all target browsers
+- **Checklist**:
+  - [ ] Chrome 90+: all features work
+  - [ ] Firefox 88+: all features work
+  - [ ] Safari 14+: all features work
+  - [ ] Edge 90+: all features work
+  - [ ] No console errors in any browser
+- **Status**: [ ] Pending
+
+#### Task 8.6: Performance validation
+
+- **Objective**: Verify app meets performance targets
+- **Checklist**:
+  - [ ] Page load time: < 2 seconds (measure with DevTools)
+  - [ ] Task add/delete/edit: UI updates < 100ms
+  - [ ] Timer tick: smooth every 1 second, no jank
+  - [ ] Theme toggle: instant (no flicker)
+  - [ ] No unused CSS or JS code
+- **Status**: [ ] Pending
+
+---
+
+### Phase 9: Code Quality & Documentation
+
+#### Task 9.1: Code cleanup and optimization
+
+- **Objective**: Polish code for maintainability
+- **Deliverables**:
+  - Remove all console.log() statements
+  - Remove commented-out code
+  - Ensure all function names are descriptive
+  - Verify only 1 CSS file and 1 JS file exist
+  - Add section comments in JS (e.g., "// ===== Timer Module =====")
+  - Add section comments in CSS (e.g., "/_ ----- Timer Styles ----- _/")
+- **Status**: [ ] Pending
+
+#### Task 9.2: Verify requirements coverage
+
+- **Objective**: Cross-check all requirements are implemented
+- **Deliverables**:
+  - Cross-reference each requirement from `requirements.md` with implementation
+  - Document any deviations or notes
+  - Verify all 23 functional requirements are met
+  - Verify non-functional requirements met (performance, code org, accessibility)
+- **Status**: [ ] Pending
+
+#### Task 9.3: Update README
+
+- **Objective**: Document project for users
+- **Deliverables**:
+  - Add project title and description
+  - Add features list (Clock, Timer, Tasks, Quick Links, Light/Dark mode)
+  - Add usage instructions (open index.html)
+  - Add browser compatibility note
+  - Add technical stack (Vanilla HTML/CSS/JS, no dependencies)
+  - Add tips (e.g., timer customizable, data persists in Local Storage)
+- **Status**: [ ] Pending
+
+#### Task 9.4: Final QA and sign-off
+
+- **Objective**: Complete final testing before release
+- **Checklist**:
+  - [ ] All tasks in Phase 1–8 marked complete
+  - [ ] No known bugs or issues
+  - [ ] All requirements documented and implemented
+  - [ ] Code passes visual and functional review
+  - [ ] Performance targets met
+  - [ ] Ready for deployment
+- **Status**: [ ] Pending
+
+---
+
+## Task Dependencies
+
+```
+Phase 1 (Setup) → Phase 2 (CSS) → Phase 3–7 (JS modules) → Phase 8 (Integration) → Phase 9 (Polish)
+```
+
+Can work in parallel:
+
+- Phase 2 CSS can start while Phase 1 HTML is being completed
+- Phase 3–7 JS modules can be worked on in parallel with some coordination
+
+---
 
 ## Notes
 
-- All tasks focus on coding implementation activities
-- Each task references specific requirements from requirements.md
-- Dependencies follow the logical build order: structure → styling/state → features → polish
-- Local Storage error handling is implemented early (Task 3) and used throughout
-- Testing and verification occur in Tasks 17-18
-
-## Task Dependency Graph
-
-```json
-{
-  "waves": [
-    [1],
-    [2, 3],
-    [4, 5, 7, 13, 17],
-    [6, 8, 14],
-    [9, 10, 11, 12, 15, 16],
-    [18]
-  ]
-}
-```
+- All tasks reference specific acceptance criteria from `requirements.md`
+- Focus on vanilla JS—no frameworks, no build tools
+- Single-file CSS and JS to keep deployment simple
+- Local Storage provides data persistence; no backend needed
+- Light/dark theme built-in from the start
